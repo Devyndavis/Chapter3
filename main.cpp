@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cstdlib>
+#include <ctime>
 
 // Recursive Binary Search
 int recursiveBinarySearch(const std::vector<int>& vec, int target, int low, int high) {
@@ -32,30 +34,55 @@ int sequentialSearch(const std::vector<int>& vec, int target) {
 }
 
 int main() {
-    // Test Data
-    std::vector<int> vec = {15, 22, 9, 3, 5, 7};  // Unsigned vector
-    std::sort(vec.begin(), vec.end());  // Sort the vector to enable binary search
+    // Initialize random seed
+    std::srand(std::time(0)); 
 
-    int target1 = 9;  // Target that is in the list
-    int target2 = 12; // Target that is not in the list
+    // Create a vector of 10 random numbers between 1 and 100
+    std::vector<int> vec(10);
+    for (int& num : vec) {
+        num = std::rand() % 100 + 1;  // Random number between 1 and 100
+    }
+
+    // Sort the vector to enable binary search
+    std::sort(vec.begin(), vec.end());
+
+    // Randomly generate a target value
+    int target = std::rand() % 100 + 1;  // Random target between 1 and 100
+
+    // Display contents of the vector and target
+    std::cout << "Contents of vector: ";
+    for (int num : vec) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "Random target: " << target << std::endl;
 
     // Recursive Binary Search
-    int index = recursiveBinarySearch(vec, target1, 0, vec.size() - 1);
-    std::cout << "Target " << target1 << " found at location " << index << std::endl;
-    index = recursiveBinarySearch(vec, target2, 0, vec.size() - 1);
-    std::cout << "Target " << target2 << " was not found, return value is " << index << std::endl;
+    int index = recursiveBinarySearch(vec, target, 0, vec.size() - 1);
+    std::cout << "Recursive Binary Search: ";
+    if (index != -1) {
+        std::cout << "Target " << target << " found at location " << index << std::endl;
+    } else {
+        std::cout << "Target " << target << " was not found." << std::endl;
+    }
 
     // Iterative Binary Search
-    index = iterativeBinarySearch(vec, target1);
-    std::cout << "Target " << target1 << " found at location " << index << std::endl;
-    index = iterativeBinarySearch(vec, target2);
-    std::cout << "Target " << target2 << " was not found, return value is " << index << std::endl;
+    index = iterativeBinarySearch(vec, target);
+    std::cout << "Iterative Binary Search: ";
+    if (index != -1) {
+        std::cout << "Target " << target << " found at location " << index << std::endl;
+    } else {
+        std::cout << "Target " << target << " was not found." << std::endl;
+    }
 
     // Sequential Search
-    index = sequentialSearch(vec, target1);
-    std::cout << "Target " << target1 << " found at location " << index << std::endl;
-    index = sequentialSearch(vec, target2);
-    std::cout << "Target " << target2 << " was not found, return value is " << index << std::endl;
+    index = sequentialSearch(vec, target);
+    std::cout << "Sequential Search: ";
+    if (index != -1) {
+        std::cout << "Target " << target << " found at location " << index << std::endl;
+    } else {
+        std::cout << "Target " << target << " was not found." << std::endl;
+    }
 
     return 0;
 }
