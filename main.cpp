@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cstdlib>
+#include <ctime>
+#include <chrono>
 
 // Recursive Binary Search
 int recursiveBinarySearch(const std::vector<int>& vec, int target, int low, int high) {
@@ -32,30 +35,60 @@ int sequentialSearch(const std::vector<int>& vec, int target) {
 }
 
 int main() {
-    // Test Data
-    std::vector<int> vec = {15, 22, 9, 3, 5, 7};  // Unsigned vector
-    std::sort(vec.begin(), vec.end());  // Sort the vector to enable binary search
+    std::srand(std::time(0));  // Initialize random seed
 
-    int target1 = 9;  // Target that is in the list
-    int target2 = 12; // Target that is not in the list
+    // Variables to accumulate times
+    double SumRBS = 0, SumIBS = 0, SumSeqS = 0;
 
-    // Recursive Binary Search
-    int index = recursiveBinarySearch(vec, target1, 0, vec.size() - 1);
-    std::cout << "Target " << target1 << " found at location " << index << std::endl;
-    index = recursiveBinarySearch(vec, target2, 0, vec.size() - 1);
-    std::cout << "Target " << target2 << " was not found, return value is " << index << std::endl;
+    // Number of iterations
+    int iterations = 10;
 
-    // Iterative Binary Search
-    index = iterativeBinarySearch(vec, target1);
-    std::cout << "Target " << target1 << " found at location " << index << std::endl;
-    index = iterativeBinarySearch(vec, target2);
-    std::cout << "Target " << target2 << " was not found, return value is " << index << std::endl;
+    // Run the experiment for different values of N
+    std::vector<int> N_values = {5000, 50000, 100000, 150000, 1000000};
 
-    // Sequential Search
-    index = sequentialSearch(vec, target1);
-    std::cout << "Target " << target1 << " found at location " << index << std::endl;
-    index = sequentialSearch(vec, target2);
-    std::cout << "Target " << target2 << " was not found, return value is " << index << std::endl;
+    // Loop through different N values
+    for (int N : N_values) {
+        SumRBS = SumIBS = SumSeqS = 0;  // Reset sums for each N
+
+        for (int i = 0; i < iterations; ++i) {
+            // Generate a vector with N random numbers
+            std::vector<int> vec(N);
+            for (int& num : vec) {
+                num = std::rand() % 100 + 1;  // Random number between 1 and 100
+            }
+
+            // Sort the vector for binary search
+            std::sort(vec.begin(), vec.end());
+
+            // Generate a random target value
+            int target = std::rand() % 100 + 1;
+
+            // Measure time for Recursive Binary Search
+            auto start = std::chrono::high_resolution_clock::now();
+            recursiveBinarySearch(vec, target, 0, vec.size() - 1);
+            auto end = std::chrono::high_resolution_clock::now();
+            SumRBS += std::chrono::duration<double, std::micro>(end - start).count();
+
+            // Measure time for Iterative Binary Search
+            start = std::chrono::high_resolution_clock::now();
+            iterativeBinarySearch(vec, target);
+            end = std::chrono::high_resolution_clock::now();
+            SumIBS += std::chrono::duration<double, std::micro>(end - start).count();
+
+            // Measure time for Sequential Search
+            start = std::chrono::high_resolution_clock::now();
+            sequentialSearch(vec, target);
+            end = std::chrono::high_resolution_clock::now();
+            SumSeqS += std::chrono::duration<double, std::micro>(end - start).count();
+        }
+
+        // Output average times for each algorithm for current N
+        std::cout << "For N = " << N << ":\n";
+        std::cout << "Average Running Time for Recursive Binary Search in microseconds: " << SumRBS / iterations << std::endl;
+        std::cout << "Average Running Time for Iterative Binary Search in microseconds: " << SumIBS / iterations << std::endl;
+        std::cout << "Average Running Time for Sequential Search in microseconds: " << SumSeqS / iterations << std::endl;
+        std::cout << std::endl;
+    }
 
     return 0;
 }
